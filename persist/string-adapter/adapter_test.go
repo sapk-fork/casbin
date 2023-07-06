@@ -45,7 +45,7 @@ p, data_group_admin, /admin/*, POST
 p, data_group_admin, /bob_data/*, POST
 g, alice, data_group_admin
 `
-	a := NewAdapter(line)
+	a := String(line)
 	m := model.NewModel()
 	err := m.LoadModelFromText(conf)
 	if err != nil {
@@ -84,7 +84,7 @@ p, data_group_admin, data3, read
 p, data_group_admin, data3, write
 g, alice, data_group_admin
 `
-	a := NewAdapter(line)
+	a := String(line)
 	m := model.NewModel()
 	err := m.LoadModelFromText(conf)
 	if err != nil {

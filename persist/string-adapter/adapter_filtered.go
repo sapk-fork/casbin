@@ -22,10 +22,10 @@ import (
 	"github.com/casbin/casbin/v3/persist"
 )
 
-// FilteredAdapter is the filtered file adapter for Casbin. It can load policy
-// from file or save policy to file and supports loading of filtered policies.
+// FilteredAdapter is the filtered string adapter for Casbin. It can load policy
+// from string and supports loading of filtered policies.
 type FilteredAdapter struct {
-	*Adapter
+	String
 	filtered bool
 }
 
@@ -37,17 +37,17 @@ type Filter struct {
 }
 
 // NewFilteredAdapter is the constructor for FilteredAdapter.
-func NewFilteredAdapter(filePath string) *FilteredAdapter {
-	a := FilteredAdapter{}
-	a.filtered = true
-	a.Adapter = NewAdapter(filePath)
-	return &a
+func NewFilteredAdapter(policy string) *FilteredAdapter {
+	return &FilteredAdapter{
+		filtered: false,
+		String:   String(policy),
+	}
 }
 
 // LoadPolicy loads all policy rules from the storage.
 func (a *FilteredAdapter) LoadPolicy(model model.Model) error {
 	a.filtered = false
-	return a.Adapter.LoadPolicy(model)
+	return a.String.LoadPolicy(model)
 }
 
 // LoadFilteredPolicy loads only policy rules that match the filter.
@@ -68,7 +68,7 @@ func (a *FilteredAdapter) LoadFilteredPolicy(model model.Model, filter interface
 }
 
 func (a *FilteredAdapter) loadFilteredPolicyFile(model model.Model, filter *Filter, handler func(string, model.Model)) error {
-	rows := strings.Split(a.lines, "\n")
+	rows := strings.Split(string(a.String), "\n")
 	for _, line := range rows {
 		line := strings.TrimSpace(line)
 		if filterLine(line, filter) {
@@ -91,7 +91,7 @@ func (a *FilteredAdapter) SavePolicy(model model.Model) error {
 	if a.filtered {
 		return errors.New("cannot save a filtered policy")
 	}
-	return a.Adapter.SavePolicy(model)
+	return errors.New("not implemented")
 }
 
 func filterLine(line string, filter *Filter) bool {
